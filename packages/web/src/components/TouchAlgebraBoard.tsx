@@ -4,6 +4,8 @@ import {
   arePolynomialsEquivalent,
   isFullyFactored,
   verifyEquationStep,
+  isExactSquareOfBinomial,
+  isExactCubeOfBinomial,
 } from '../utils/mathChecker';
 
 interface TouchAlgebraBoardProps {
@@ -184,6 +186,41 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
       onMistake('Calcolo o segno errato nella scomposizione');
       setFeedback('⚠️ I calcoli o i segni non tornano: controlla con attenzione ogni termine.');
       return;
+    }
+
+    // Identificazione didattica: è un Quadrato di Binomio o un Cubo di Binomio?
+    const isSquareOfBinomial =
+      subType === 'square_binomial' ||
+      /quadrato\s+di\s+binomio/i.test(initialTitle) ||
+      /quadrato\s+di\s+binomio/i.test(metadata?.title || '') ||
+      isExactSquareOfBinomial(cleanOriginalExpr);
+
+    const isCubeOfBinomial =
+      subType === 'cube_binomial' ||
+      /cubo\s+di\s+binomio/i.test(initialTitle) ||
+      /cubo\s+di\s+binomio/i.test(metadata?.title || '') ||
+      isExactCubeOfBinomial(cleanOriginalExpr);
+
+    // Se l'esercizio è un Quadrato di Binomio: la scomposizione parziale è ERRATA!
+    if (isSquareOfBinomial) {
+      const isSquarePower = /\)[²2]/.test(written) || /\)\^2/.test(written);
+      if (!isSquarePower) {
+        setIsError(true);
+        onMistake('Scomposizione parziale non consentita: è un Quadrato di Binomio (A ± B)²');
+        setFeedback('⚠️ Scomposizione parziale errata! Questo trinomio è un Quadrato di Binomio: individua i due quadrati e il doppio prodotto, e scrivi direttamente la forma (A ± B)². Non applicare raccoglimenti parziali!');
+        return;
+      }
+    }
+
+    // Se l'esercizio è un Cubo di Binomio: la scomposizione parziale è ERRATA!
+    if (isCubeOfBinomial) {
+      const isCubePower = /\)[³3]/.test(written) || /\)\^3/.test(written);
+      if (!isCubePower) {
+        setIsError(true);
+        onMistake('Scomposizione parziale non consentita: è un Cubo di Binomio (A ± B)³');
+        setFeedback('⚠️ Scomposizione parziale errata! Questo quadrinomio è un Cubo di Binomio: individua i due cubi estremi A³ e B³ e verifica i tripli prodotti. Scrivi direttamente la forma (A ± B)³ senza tentare raccoglimenti parziali!');
+        return;
+      }
     }
 
     // Se è algebricamente equivalente, controlliamo se è completamente fattorizzata
