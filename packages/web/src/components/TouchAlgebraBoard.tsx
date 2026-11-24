@@ -270,14 +270,18 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
       setFeedback(`🏆 Polinomio scomposto perfettamente: ${written}!`);
       onWin(written, history.length);
     } else {
-      // Passaggio intermedio valido (es. raccoglimento parziale x²(3x − 4) − 3(3x − 4))
+      // Passaggio intermedio valido (es. raccoglimento a fattor comune 2(x² + 5x + 6) o parziale x²(3x − 4) − 3(3x − 4))
       onMoveAction();
       setHistory(h => [...h, written]);
       setCurrentWriting('');
       setIsError(false);
       setIsSuccessStep(true);
-      setFeedback('✨ Bravissimo! Passaggio corretto. Ora completa raccogliendo il fattore comune!');
-      setTimeout(() => setIsSuccessStep(false), 2500);
+      if (written.includes('(')) {
+        setFeedback('✨ Ottimo passaggio! Il calcolo è corretto, ma la scomposizione non è ancora completa: continua a scomporre il fattore tra parentesi!');
+      } else {
+        setFeedback('✨ Bravissimo! Passaggio corretto. Ora completa raccogliendo il fattore comune!');
+      }
+      setTimeout(() => setIsSuccessStep(false), 3500);
     }
   };
 

@@ -80,8 +80,78 @@ export function arePolynomialsEquivalent(expr1: string, expr2: string): boolean 
 }
 
 /**
- * Determina se un'espressione polinomiale è completamente fattorizzata
- * (prodotto di fattori senza addizioni/sottrazioni all'esterno delle parentesi).
+ * Estrae tutti i fattori racchiusi tra parentesi a livello principale.
+ */
+export function extractParenthesizedFactors(s: string): string[] {
+  const factors: string[] = [];
+  let depth = 0;
+  let start = -1;
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === '(') {
+      if (depth === 0) start = i + 1;
+      depth++;
+    } else if (s[i] === ')') {
+      depth--;
+      if (depth === 0 && start !== -1) {
+        factors.push(s.slice(start, i));
+        start = -1;
+      }
+    }
+  }
+  return factors;
+}
+
+/**
+ * Controlla se un fattore racchiuso tra parentesi può essere ulteriormente scomposto
+ * (ad esempio se è un trinomio notevole x² + 5x + 6 o una differenza di quadrati x² - 4).
+ */
+export function canFactorBeDecomposedFurther(factor: string): boolean {
+  const clean = cleanMath(factor);
+  // Se non contiene potenze maggiori di 1, è un fattore lineare (irriducibile)
+  if (!clean.includes('^') && !clean.includes('²') && !clean.includes('³') && !clean.includes('⁴')) {
+    return false;
+  }
+
+  // Valutiamo se è un trinomio o binomio di 2° grado in x con discriminante razionale non negativo
+  const v0 = evaluateAt(factor, 0);
+  const v1 = evaluateAt(factor, 1);
+  const v_1 = evaluateAt(factor, -1);
+  if (!isNaN(v0) && !isNaN(v1) && !isNaN(v_1)) {
+    const c = v0;
+    const a = (v1 + v_1 - 2 * c) / 2;
+    const b = (v1 - v_1) / 2;
+
+    if (Math.abs(a) > 1e-5) {
+      const v2 = evaluateAt(factor, 2);
+      const expected2 = a * 4 + b * 2 + c;
+      if (Math.abs(v2 - expected2) < 1e-4) {
+        const disc = b * b - 4 * a * c;
+        if (disc >= -1e-5) {
+          const sqrtDisc = Math.sqrt(Math.max(0, disc));
+          const roundedSqrt = Math.round(sqrtDisc);
+          // Se delta è un quadrato perfetto intero (radici razionali intere)
+          // Ad es. Delta = 1 (x² + 5x + 6), Delta = 16 (x² - 4), Delta = 0 (x² + 6x + 9)
+          if (Math.abs(sqrtDisc - roundedSqrt) < 1e-4) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  // Differenze di quadrati a 2 variabili: x² - y² o 4x² - 9y²
+  if ((clean.includes('x^2') || clean.includes('x²')) && (clean.includes('y^2') || clean.includes('y²'))) {
+    if (clean.includes('-')) return true;
+  }
+
+  return false;
+}
+
+/**
+ * Determina se un'espressione polinomiale è COMPLETAMENTE fattorizzata:
+ * 1. Prodotto puro (nessun operatore + o - a livello 0 esterno alle parentesi).
+ * 2. Nessuno dei fattori interni tra parentesi può essere ulteriormente scomposto
+ *    (ad es. 2(x² + 5x + 6) non è completa finché non diventa 2(x + 2)(x + 3)).
  */
 export function isFullyFactored(expr: string): boolean {
   const s = cleanMath(expr);
@@ -96,8 +166,21 @@ export function isFullyFactored(expr: string): boolean {
       if (i > 0) return false;
     }
   }
-  // Deve contenere almeno un fattore in parentesi o essere un monomio
-  return s.includes('(') || (!s.includes('+') && !s.includes('-'));
+
+  // Se non contiene parentesi, per essere fattorizzato deve essere un monomio puro senza somme/sottrazioni
+  if (!s.includes('(')) {
+    return !s.includes('+') && !s.includes('-');
+  }
+
+  // Estraiamo tutti i fattori racchiusi tra parentesi e verifichiamo che nessuno sia ulteriormente riducibile
+  const factors = extractParenthesizedFactors(s);
+  for (const f of factors) {
+    if (canFactorBeDecomposedFurther(f)) {
+      return false; // Almeno un fattore interno può e deve essere ancora scomposto!
+    }
+  }
+
+  return true;
 }
 
 /**
