@@ -331,7 +331,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main: Il Quaderno Digitale di Calcolo */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1.5rem 1rem' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '1rem 0.75rem' }}>
         <TouchAlgebraBoard
           key={`${currentLevel.id}-${restartCount}`}
           initialTitle={currentLevel.expression}

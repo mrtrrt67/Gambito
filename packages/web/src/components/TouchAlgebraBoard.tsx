@@ -536,13 +536,15 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
                   </>
                 ) : (
                   <span style={{
-                    color: 'rgba(148, 163, 184, 0.45)',
-                    fontSize: '1.25rem',
+                    color: 'rgba(148, 163, 184, 0.5)',
+                    fontSize: '0.95rem',
                     fontStyle: 'italic',
                     fontWeight: 600,
                     fontFamily: 'var(--font-sans)',
+                    whiteSpace: 'normal',
+                    lineHeight: 1.3,
                   }}>
-                    Tocca i simboli in basso o trascina qui per scrivere il passaggio...
+                    Tocca i simboli in basso o trascina qui...
                   </span>
                 )}
               </div>
@@ -649,14 +651,15 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
           <div className="exponent-section" style={{
             display: 'flex',
             flexDirection: 'column',
+            alignItems: 'center',
             gap: '6px',
             background: 'rgba(168, 85, 247, 0.08)',
             border: '1px solid rgba(168, 85, 247, 0.25)',
             borderRadius: '14px',
-            padding: '0.45rem 0.75rem',
+            padding: '0.5rem 0.75rem',
           }}>
             {/* Riga A: label + ², ³, ⁴, ⁵, xⁿ */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
               <span style={{
                 fontSize: '0.8rem',
                 color: '#c084fc',
@@ -705,7 +708,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
             </div>
 
             {/* Riga B: scorciatoie x², x³, x⁴, y² */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
               {[
                 { sym: 'x²', label: 'x²' },
                 { sym: 'x³', label: 'x³' },

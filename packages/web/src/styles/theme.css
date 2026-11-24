@@ -22,12 +22,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--bg-dark);
   color: #f8fafc;
   font-family: var(--font-sans);
   min-height: 100vh;
-  overflow-x: hidden;
   user-select: none;
 }
 
@@ -178,5 +183,41 @@ button {
   .writing-line {
     font-size: 1.8rem !important;
     min-height: 54px !important;
+  }
+
+  /* ── HEADER MOBILE: non sticky, arioso e compatto ── */
+  .app-header {
+    position: relative !important;
+    padding: 0.6rem 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+  .header-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .header-btn-text {
+    display: none !important;
+  }
+  .header-topic-select {
+    flex: 1;
+    min-width: 0;
+    max-width: none !important;
+    font-size: 0.78rem !important;
+  }
+  .header-practice-btn {
+    padding: 0.4rem 0.65rem !important;
+  }
+  .header-hint-btn {
+    display: none !important; /* già presente nel foglio quaderno */
+  }
+
+  /* ── MAIN: spazio pulito attorno al quaderno ── */
+  main {
+    padding: 0.75rem 0.5rem !important;
+  }
+
+  /* ── MODAL MISSIONE COMPIUTA: titolo leggibile ── */
+  .mission-title {
+    font-size: 1.65rem !important;
   }
 }

@@ -41,26 +41,31 @@ export const CleanMissionCompleteModal: React.FC<CleanMissionCompleteModalProps>
       background: 'rgba(5, 8, 20, 0.88)',
       backdropFilter: 'blur(12px)',
       display: 'flex',
+      flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center',
-      padding: '1.25rem',
+      justifyContent: 'flex-start',
+      padding: '1rem',
+      boxSizing: 'border-box',
       userSelect: 'none',
       animation: 'fadeIn 0.25s ease-out',
+      overflowY: 'auto',
     }}>
       <div style={{
         background: '#0d1326',
-        border: '2.5px solid #10b981',
-        borderRadius: '28px',
-        padding: '2.5rem 2rem',
-        maxWidth: '540px',
+        border: '2px solid #10b981',
+        borderRadius: '24px',
+        padding: '1.5rem 1.25rem',
+        maxWidth: '460px',
         width: '100%',
+        boxSizing: 'border-box',
         boxShadow: '0 0 60px rgba(16, 185, 129, 0.45)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         textAlign: 'center',
-        gap: '1.5rem',
+        gap: '1rem',
         position: 'relative',
+        margin: 'auto',
       }}>
         {/* Badge in alto */}
         <div style={{
@@ -78,19 +83,20 @@ export const CleanMissionCompleteModal: React.FC<CleanMissionCompleteModalProps>
         </div>
 
         {/* Titolo Principale Esplicito */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-          <div style={{ fontSize: '3.2rem', lineHeight: '1' }}>🎉</div>
-          <h2 style={{
-            fontSize: '2.5rem',
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', width: '100%' }}>
+          <div style={{ fontSize: '2.6rem', lineHeight: '1' }}>🎉</div>
+          <h2 className="mission-title" style={{
+            fontSize: 'clamp(1.5rem, 6vw, 2.25rem)',
             fontWeight: 950,
             color: '#fff',
             letterSpacing: '0.5px',
+            lineHeight: 1.15,
             textShadow: '0 0 30px rgba(16, 185, 129, 0.8)',
-            margin: '0.5rem 0 0 0',
+            margin: '0.35rem 0 0 0',
           }}>
             MISSIONE COMPIUTA!
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '1.1rem', margin: 0 }}>
+          <p style={{ color: '#94a3b8', fontSize: '0.95rem', margin: 0 }}>
             Tutti i passaggi algebrici sono stati verificati con successo!
           </p>
         </div>
@@ -139,23 +145,23 @@ export const CleanMissionCompleteModal: React.FC<CleanMissionCompleteModalProps>
         {/* Statistiche di Prestazione */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '1rem',
+          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+          gap: '0.6rem',
           width: '100%',
         }}>
-          <div style={{ padding: '0.8rem', borderRadius: '14px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase' }}>Punteggio</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fbbf24' }}>{score} pt</div>
+          <div style={{ minWidth: 0, padding: '0.65rem 0.4rem', borderRadius: '14px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase' }}>Punteggio</div>
+            <div style={{ fontSize: 'clamp(1.05rem, 4vw, 1.4rem)', fontWeight: 900, color: '#fbbf24' }}>{score} pt</div>
           </div>
-          <div style={{ padding: '0.8rem', borderRadius: '14px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase' }}>Mosse / Par</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: isUnderPar ? '#34d399' : '#e2e8f0' }}>
+          <div style={{ minWidth: 0, padding: '0.65rem 0.4rem', borderRadius: '14px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase' }}>Mosse / Par</div>
+            <div style={{ fontSize: 'clamp(1.05rem, 4vw, 1.4rem)', fontWeight: 900, color: isUnderPar ? '#34d399' : '#e2e8f0' }}>
               {moves} / {par}
             </div>
           </div>
-          <div style={{ padding: '0.8rem', borderRadius: '14px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase' }}>Vite</div>
-            <div style={{ fontSize: '1.3rem', color: '#f87171' }}>
+          <div style={{ minWidth: 0, padding: '0.65rem 0.4rem', borderRadius: '14px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase' }}>Vite</div>
+            <div style={{ fontSize: 'clamp(1rem, 3.5vw, 1.25rem)', color: '#f87171' }}>
               {'❤️'.repeat(lives)}{'🖤'.repeat(Math.max(0, 3 - lives))}
             </div>
           </div>
