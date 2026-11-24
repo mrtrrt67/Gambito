@@ -571,18 +571,15 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
   const handleVerifyTrinomial = () => {
     const parseSignedNum = (val: any): { str: string; num: number } | null => {
       if (val === undefined || val === null || val === '') return null;
-      let s = String(val).trim().replace('-', '−');
+      let s = String(val).trim().replace(/\s+/g, '').replace(/-/g, '−');
       while (s.startsWith('++')) s = s.slice(1);
       const isMinus = s.startsWith('−');
-      const cleanVal = s.replace('+', '').replace('−', '');
+      const cleanVal = s.replace(/\+/g, '').replace(/−/g, '');
       const numVal = isMinus ? -parseFloat(cleanVal) : parseFloat(cleanVal);
       if (isNaN(numVal)) return null;
       const formatted = numVal >= 0 ? `+${numVal}` : `−${Math.abs(numVal)}`;
       return { str: formatted, num: numVal };
     };
-
-    const target1 = parseSignedNum(metadata?.d1);
-    const target2 = parseSignedNum(metadata?.d2);
 
     const user1 = parseSignedNum(trinomSlots.d1);
     const user2 = parseSignedNum(trinomSlots.d2);
@@ -594,23 +591,51 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
       return;
     }
 
-    let isCorrect = false;
+    // Estrai la somma (s) e il prodotto (p) richiesti
+    let targetSum: number | null = null;
+    let targetProd: number | null = null;
 
+    // 1. Prova da metadata se disponibile
+    const target1 = parseSignedNum(metadata?.d1);
+    const target2 = parseSignedNum(metadata?.d2);
     if (target1 && target2) {
-      // 1. Corrispondenza diretta dei fattori
-      const matchDirect = (user1.str === target1.str && user2.str === target2.str) ||
-        (user1.str === target2.str && user2.str === target1.str);
-      // 2. Corrispondenza algebrica (somma e prodotto identici)
-      const sumMatch = (user1.num + user2.num === target1.num + target2.num);
-      const prodMatch = (user1.num * user2.num === target1.num * target2.num);
-      isCorrect = matchDirect || (sumMatch && prodMatch);
-    } else {
-      // Fallback dal testo: es. x² + 5x + 6 => somma 5, prodotto 6
-      const has5x = initialTitle.includes('+ 5x') || (cleanExpr && cleanExpr.includes('+ 5x'));
-      const has6 = initialTitle.includes('+ 6') || (cleanExpr && cleanExpr.includes('+ 6'));
-      if (has5x && has6 && user1.num + user2.num === 5 && user1.num * user2.num === 6) {
-        isCorrect = true;
+      targetSum = target1.num + target2.num;
+      targetProd = target1.num * target2.num;
+    }
+
+    // 2. Calcolo algebrico dinamico estrapolando i coefficienti dal trinomio x² + sx + p
+    const exprText = (cleanExpr || initialTitle || '').replace(/\s+/g, '').replace(/−/g, '-');
+    const match = exprText.match(/x(?:\^2|²)([+-]\d*)x([+-]\d+)/);
+    if (match) {
+      const sPart = match[1];
+      const pPart = match[2];
+      const s = (sPart === '+' || sPart === '') ? 1 : (sPart === '-' ? -1 : parseInt(sPart, 10));
+      const p = parseInt(pPart, 10);
+      if (!isNaN(s) && !isNaN(p)) {
+        targetSum = s;
+        targetProd = p;
       }
+    }
+
+    // 3. Fallback per pattern specifici
+    if (targetSum === null || targetProd === null) {
+      if (exprText.includes('+5x') && exprText.includes('+6')) {
+        targetSum = 5;
+        targetProd = 6;
+      } else if (exprText.includes('-7x') && exprText.includes('+12')) {
+        targetSum = -7;
+        targetProd = 12;
+      }
+    }
+
+    let isCorrect = false;
+    if (targetSum !== null && targetProd !== null) {
+      const userSum = user1.num + user2.num;
+      const userProd = user1.num * user2.num;
+      isCorrect = (userSum === targetSum && userProd === targetProd);
+    } else if (target1 && target2) {
+      isCorrect = (user1.str === target1.str && user2.str === target2.str) ||
+                  (user1.str === target2.str && user2.str === target1.str);
     }
 
     if (!isCorrect) {
@@ -1249,12 +1274,12 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
     if (tokenId.startsWith('palette-')) {
       const sym = draggedTokenText;
       if (dropZone) {
-        if (dropZone === 'trinom-bin-1') {
+        if (dropZone === 'trinom-bin-1' || dropZone === 'trinom-d1') {
           setTrinomSlots(prev => ({ ...prev, d1: sym }));
           onMoveAction();
           return;
         }
-        if (dropZone === 'trinom-bin-2') {
+        if (dropZone === 'trinom-bin-2' || dropZone === 'trinom-d2') {
           setTrinomSlots(prev => ({ ...prev, d2: sym }));
           onMoveAction();
           return;
@@ -1530,12 +1555,18 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
         const targetD1 = metadata?.d1 || (initialTitle.includes('+ 5x') ? '+2' : '−3');
         const targetD2 = metadata?.d2 || (initialTitle.includes('+ 5x') ? '+3' : '−4');
 
-        if (dropZone === 'trinom-bin-1') {
+        if (dropZone === 'trinom-bin-1' || dropZone === 'trinom-d1') {
           onMoveAction();
           setTrinomSlots(prev => {
             const up = { ...prev, d1: val };
             if (up.d2) {
-              const isMatch = (up.d1 === targetD1 && up.d2 === targetD2) || (up.d1 === targetD2 && up.d2 === targetD1);
+              const u1 = parseInt(up.d1.replace('+', '').replace('−', '-'), 10);
+              const u2 = parseInt(up.d2.replace('+', '').replace('−', '-'), 10);
+              const t1 = parseInt(targetD1.replace('+', '').replace('−', '-'), 10);
+              const t2 = parseInt(targetD2.replace('+', '').replace('−', '-'), 10);
+              const isMatch = (up.d1 === targetD1 && up.d2 === targetD2) ||
+                              (up.d1 === targetD2 && up.d2 === targetD1) ||
+                              (!isNaN(u1) && !isNaN(u2) && !isNaN(t1) && !isNaN(t2) && u1 + u2 === t1 + t2 && u1 * u2 === t1 * t2);
               if (isMatch) {
                 const final = `(x ${up.d1})(x ${up.d2})`;
                 setHistory(h => [...h, final]);
@@ -1552,12 +1583,18 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
           });
           return;
         }
-        if (dropZone === 'trinom-bin-2') {
+        if (dropZone === 'trinom-bin-2' || dropZone === 'trinom-d2') {
           onMoveAction();
           setTrinomSlots(prev => {
             const up = { ...prev, d2: val };
             if (up.d1) {
-              const isMatch = (up.d1 === targetD1 && up.d2 === targetD2) || (up.d1 === targetD2 && up.d2 === targetD1);
+              const u1 = parseInt(up.d1.replace('+', '').replace('−', '-'), 10);
+              const u2 = parseInt(up.d2.replace('+', '').replace('−', '-'), 10);
+              const t1 = parseInt(targetD1.replace('+', '').replace('−', '-'), 10);
+              const t2 = parseInt(targetD2.replace('+', '').replace('−', '-'), 10);
+              const isMatch = (up.d1 === targetD1 && up.d2 === targetD2) ||
+                              (up.d1 === targetD2 && up.d2 === targetD1) ||
+                              (!isNaN(u1) && !isNaN(u2) && !isNaN(t1) && !isNaN(t2) && u1 + u2 === t1 + t2 && u1 * u2 === t1 * t2);
               if (isMatch) {
                 const final = `(x ${up.d1})(x ${up.d2})`;
                 setHistory(h => [...h, final]);
@@ -4218,11 +4255,15 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
 
             <div style={{
               fontFamily: 'var(--font-math)',
-              fontSize: '5rem',
+              fontSize: 'clamp(1.8rem, 6vw, 3.6rem)',
               fontWeight: 900,
               color: '#fff',
               textShadow: '0 0 45px rgba(0, 240, 255, 0.95)',
               marginBottom: '0.75rem',
+              whiteSpace: 'nowrap',
+              overflowX: 'auto',
+              maxWidth: '100%',
+              padding: '0.2rem 0.5rem',
             }}>
               {finalResultStr}
             </div>
