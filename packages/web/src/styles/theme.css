@@ -102,3 +102,81 @@ button {
   cursor: grabbing;
   transform: scale(1.05);
 }
+
+/* ============================================================
+   RESPONSIVE MOBILE (max 480px)
+   ============================================================ */
+@media (max-width: 480px) {
+  /* Nascondi il margine rosso decorativo su schermi stretti */
+  .notebook-margin-line {
+    display: none !important;
+  }
+
+  /* Riduci il padding sinistro del foglio (non serve più compensare la linea) */
+  .notebook-content-area {
+    padding-left: 8px !important;
+  }
+
+  /* Notebook: meno padding complessivo */
+  .notebook-grid {
+    padding: 1rem 0.75rem !important;
+  }
+
+  /* Cassetta degli attrezzi più compatta */
+  .keyboard-panel {
+    padding: 0.75rem 0.6rem !important;
+    gap: 0.6rem !important;
+  }
+
+  /* Pulsanti numeri: più piccoli su mobile */
+  .key-num {
+    min-width: 34px !important;
+    height: 36px !important;
+    font-size: 1.1rem !important;
+  }
+
+  /* Pulsanti variabili e operatori */
+  .key-var, .key-op, .key-paren {
+    min-width: 32px !important;
+    height: 36px !important;
+    font-size: 1.1rem !important;
+  }
+
+  /* Sezione esponenti: più compatta */
+  .exponent-section {
+    padding: 0.35rem 0.5rem !important;
+    gap: 5px !important;
+  }
+
+  /* Pulsanti esponenti su mobile */
+  .key-exp {
+    min-width: 36px !important;
+    height: 36px !important;
+    font-size: 1.1rem !important;
+    padding: 0 0.35rem !important;
+  }
+
+  /* Label ESPONENTI: solo icona su mobile, nasconde testo */
+  .exp-label-text {
+    display: none;
+  }
+
+  /* Pulsanti Canc / Svuota */
+  .key-action {
+    height: 36px !important;
+    padding: 0 0.65rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Esercizio e passaggi: font più piccolo per non uscire dallo schermo */
+  .exercise-display {
+    font-size: 1.8rem !important;
+  }
+  .step-display {
+    font-size: 1.6rem !important;
+  }
+  .writing-line {
+    font-size: 1.8rem !important;
+    min-height: 54px !important;
+  }
+}

@@ -364,7 +364,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
         }}
       >
         {/* Margine rosso del quaderno di scuola sulla sinistra */}
-        <div style={{
+        <div className="notebook-margin-line" style={{
           position: 'absolute',
           top: 0,
           bottom: 0,
@@ -432,7 +432,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
         </div>
 
         {/* Righe del Quaderno di Calcolo */}
-        <div style={{
+        <div className="notebook-content-area" style={{
           display: 'flex',
           flexDirection: 'column',
           gap: '1.1rem',
@@ -444,7 +444,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
             <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Esercizio:
             </span>
-            <div style={{
+            <div className="exercise-display" style={{
               fontSize: '2.5rem',
               fontFamily: 'var(--font-math)',
               fontWeight: 900,
@@ -462,7 +462,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
           {history.slice(1).map((step, idx) => (
             <div
               key={idx}
-              className="animate-pop"
+              className="animate-pop step-display"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -495,6 +495,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
+                className="writing-line"
                 style={{
                   minHeight: '68px',
                   padding: '0.6rem 1.25rem',
@@ -573,7 +574,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
       {/* CASSETTA DEGLI ATTREZZI IN BASSO (PANNELLO TESSERE & SIMBOLI)         */}
       {/* ===================================================================== */}
       {!isSolved && (
-        <div style={{
+        <div className="keyboard-panel" style={{
           background: 'rgba(10, 15, 30, 0.95)',
           border: '1.5px solid rgba(56, 189, 248, 0.35)',
           borderRadius: '22px',
@@ -623,6 +624,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
                 draggable
                 onDragStart={e => handleDragStart(e, num)}
                 onClick={() => insertSymbol(num)}
+                className="key-num"
                 style={{
                   minWidth: '42px',
                   height: '42px',
@@ -643,99 +645,98 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
             ))}
           </div>
 
-          {/* Fila 2: Esponenti & Potenze (In Evidenza) */}
-          <div style={{
+          {/* Fila 2: Esponenti & Potenze — RIGA A: esponenti puri */}
+          <div className="exponent-section" style={{
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            flexWrap: 'wrap',
+            flexDirection: 'column',
+            gap: '6px',
             background: 'rgba(168, 85, 247, 0.08)',
             border: '1px solid rgba(168, 85, 247, 0.25)',
             borderRadius: '14px',
             padding: '0.45rem 0.75rem',
           }}>
-            <span style={{
-              fontSize: '0.8rem',
-              color: '#c084fc',
-              fontWeight: 900,
-              letterSpacing: '0.5px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              marginRight: '2px',
-            }}>
-              <span>⚡</span> ESPONENTI:
-            </span>
+            {/* Riga A: label + ², ³, ⁴, ⁵, xⁿ */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <span style={{
+                fontSize: '0.8rem',
+                color: '#c084fc',
+                fontWeight: 900,
+                letterSpacing: '0.5px',
+                whiteSpace: 'nowrap',
+              }}>
+                <span>⚡</span><span className="exp-label-text"> ESPONENTI:</span>
+              </span>
 
-            {/* Esponenti Puri (da applicare a parentesi, lettere o numeri) */}
-            {[
-              { sym: '²', label: '²', title: 'Esponente 2 (Quadrato)' },
-              { sym: '³', label: '³', title: 'Esponente 3 (Cubo)' },
-              { sym: '⁴', label: '⁴', title: 'Esponente 4' },
-              { sym: '⁵', label: '⁵', title: 'Esponente 5' },
-              { sym: '^', label: 'xⁿ', title: 'Esponente (^)' },
-            ].map(item => (
-              <button
-                key={item.sym}
-                type="button"
-                draggable
-                onDragStart={e => handleDragStart(e, item.sym)}
-                onClick={() => insertSymbol(item.sym)}
-                title={item.title}
-                style={{
-                  minWidth: '44px',
-                  height: '42px',
-                  padding: '0 0.55rem',
-                  borderRadius: '10px',
-                  background: 'rgba(168, 85, 247, 0.18)',
-                  border: '1.5px solid #c084fc',
-                  color: '#e9d5ff',
-                  fontFamily: 'var(--font-math)',
-                  fontSize: item.sym === '^' ? '1.1rem' : '1.5rem',
-                  fontWeight: 900,
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(168, 85, 247, 0.2)',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {item.label}
-              </button>
-            ))}
+              {/* Esponenti Puri */}
+              {[
+                { sym: '²', label: '²', title: 'Esponente 2 (Quadrato)' },
+                { sym: '³', label: '³', title: 'Esponente 3 (Cubo)' },
+                { sym: '⁴', label: '⁴', title: 'Esponente 4' },
+                { sym: '⁵', label: '⁵', title: 'Esponente 5' },
+                { sym: '^', label: 'xⁿ', title: 'Esponente (^)' },
+              ].map(item => (
+                <button
+                  key={item.sym}
+                  type="button"
+                  draggable
+                  onDragStart={e => handleDragStart(e, item.sym)}
+                  onClick={() => insertSymbol(item.sym)}
+                  title={item.title}
+                  className="key-exp"
+                  style={{
+                    minWidth: '44px',
+                    height: '42px',
+                    padding: '0 0.55rem',
+                    borderRadius: '10px',
+                    background: 'rgba(168, 85, 247, 0.18)',
+                    border: '1.5px solid #c084fc',
+                    color: '#e9d5ff',
+                    fontFamily: 'var(--font-math)',
+                    fontSize: item.sym === '^' ? '1.1rem' : '1.5rem',
+                    fontWeight: 900,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(168, 85, 247, 0.2)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
 
-            {/* Divisore sottile */}
-            <div style={{ width: '1px', height: '28px', background: 'rgba(168, 85, 247, 0.3)', margin: '0 4px' }} />
-
-            {/* Scorciatoie potenze con variabile */}
-            {[
-              { sym: 'x²', label: 'x²' },
-              { sym: 'x³', label: 'x³' },
-              { sym: 'x⁴', label: 'x⁴' },
-              { sym: 'y²', label: 'y²' },
-            ].map(p => (
-              <button
-                key={p.sym}
-                type="button"
-                draggable
-                onDragStart={e => handleDragStart(e, p.sym)}
-                onClick={() => insertSymbol(p.sym)}
-                style={{
-                  minWidth: '44px',
-                  height: '42px',
-                  padding: '0 0.55rem',
-                  borderRadius: '10px',
-                  background: 'rgba(0, 240, 255, 0.1)',
-                  border: '1.5px solid rgba(0, 240, 255, 0.45)',
-                  color: '#00f0ff',
-                  fontFamily: 'var(--font-math)',
-                  fontSize: '1.3rem',
-                  fontWeight: 900,
-                  cursor: 'pointer',
-                }}
-              >
-                {p.label}
-              </button>
-            ))}
+            {/* Riga B: scorciatoie x², x³, x⁴, y² */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              {[
+                { sym: 'x²', label: 'x²' },
+                { sym: 'x³', label: 'x³' },
+                { sym: 'x⁴', label: 'x⁴' },
+                { sym: 'y²', label: 'y²' },
+              ].map(p => (
+                <button
+                  key={p.sym}
+                  type="button"
+                  draggable
+                  onDragStart={e => handleDragStart(e, p.sym)}
+                  onClick={() => insertSymbol(p.sym)}
+                  className="key-exp"
+                  style={{
+                    minWidth: '44px',
+                    height: '42px',
+                    padding: '0 0.55rem',
+                    borderRadius: '10px',
+                    background: 'rgba(0, 240, 255, 0.1)',
+                    border: '1.5px solid rgba(0, 240, 255, 0.45)',
+                    color: '#00f0ff',
+                    fontFamily: 'var(--font-math)',
+                    fontSize: '1.3rem',
+                    fontWeight: 900,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Fila 3: Variabili, Segni, Parentesi & Controlli */}
@@ -747,6 +748,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
                 draggable
                 onDragStart={e => handleDragStart(e, v)}
                 onClick={() => insertSymbol(v)}
+                className="key-var"
                 style={{
                   minWidth: '40px',
                   height: '42px',
@@ -772,6 +774,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
                 draggable
                 onDragStart={e => handleDragStart(e, s)}
                 onClick={() => insertSymbol(s)}
+                className="key-op"
                 style={{
                   minWidth: '42px',
                   height: '42px',
@@ -797,6 +800,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
                 draggable
                 onDragStart={e => handleDragStart(e, p)}
                 onClick={() => insertSymbol(p)}
+                className="key-paren"
                 style={{
                   minWidth: '40px',
                   height: '42px',
@@ -817,6 +821,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
             <button
               type="button"
               onClick={handleBackspace}
+              className="key-action"
               style={{
                 height: '42px',
                 padding: '0 0.85rem',
@@ -835,6 +840,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
             <button
               type="button"
               onClick={handleClearLine}
+              className="key-action"
               style={{
                 height: '42px',
                 padding: '0 0.85rem',
