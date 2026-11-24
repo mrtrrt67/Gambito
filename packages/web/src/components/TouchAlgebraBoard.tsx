@@ -6,6 +6,8 @@ import {
   verifyEquationStep,
   isExactSquareOfBinomial,
   isExactCubeOfBinomial,
+  isExactSquareOfTrinomial,
+  isExactCubeOfTrinomial,
 } from '../utils/mathChecker';
 
 interface TouchAlgebraBoardProps {
@@ -188,7 +190,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
       return;
     }
 
-    // Identificazione didattica: è un Quadrato di Binomio o un Cubo di Binomio?
+    // Identificazione didattica: è un Quadrato/Cubo di Binomio o Quadrato/Cubo di Trinomio?
     const isSquareOfBinomial =
       subType === 'square_binomial' ||
       /quadrato\s+di\s+binomio/i.test(initialTitle) ||
@@ -200,6 +202,16 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
       /cubo\s+di\s+binomio/i.test(initialTitle) ||
       /cubo\s+di\s+binomio/i.test(metadata?.title || '') ||
       isExactCubeOfBinomial(cleanOriginalExpr);
+
+    const isSquareOfTrinomial =
+      subType === 'square_trinomial' ||
+      /quadrato\s+di\s+trinomio/i.test(initialTitle) ||
+      /quadrato\s+di\s+trinomio/i.test(metadata?.title || '');
+
+    const isCubeOfTrinomial =
+      subType === 'cube_trinomial' ||
+      /cubo\s+di\s+trinomio/i.test(initialTitle) ||
+      /cubo\s+di\s+trinomio/i.test(metadata?.title || '');
 
     // Se l'esercizio è un Quadrato di Binomio: la scomposizione parziale è ERRATA!
     if (isSquareOfBinomial) {
@@ -219,6 +231,28 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
         setIsError(true);
         onMistake('Scomposizione parziale non consentita: è un Cubo di Binomio (A ± B)³');
         setFeedback('⚠️ Scomposizione parziale errata! Questo quadrinomio è un Cubo di Binomio: individua i due cubi estremi A³ e B³ e verifica i tripli prodotti. Scrivi direttamente la forma (A ± B)³ senza tentare raccoglimenti parziali!');
+        return;
+      }
+    }
+
+    // Se l'esercizio è un Quadrato di Trinomio: la scomposizione parziale è ERRATA!
+    if (isSquareOfTrinomial) {
+      const isSquarePower = /\)[²2]/.test(written) || /\)\^2/.test(written);
+      if (!isSquarePower) {
+        setIsError(true);
+        onMistake('Scomposizione parziale non consentita: è un Quadrato di Trinomio (A ± B ± C)²');
+        setFeedback('⚠️ Scomposizione parziale errata! Questo polinomio a 6 termini è un Quadrato di Trinomio: individua i tre quadrati (A², B², C²) e i tre doppi prodotti, e scrivi direttamente la forma (A ± B ± C)². Non applicare raccoglimenti parziali!');
+        return;
+      }
+    }
+
+    // Se l'esercizio è un Cubo di Trinomio: la scomposizione parziale è ERRATA!
+    if (isCubeOfTrinomial) {
+      const isCubePower = /\)[³3]/.test(written) || /\)\^3/.test(written);
+      if (!isCubePower) {
+        setIsError(true);
+        onMistake('Scomposizione parziale non consentita: è un Cubo di Trinomio (A ± B ± C)³');
+        setFeedback('⚠️ Scomposizione parziale errata! Questo polinomio è un Cubo di Trinomio: individua i cubi fondamentali e scrivi direttamente la forma (A ± B ± C)³. Non applicare raccoglimenti parziali!');
         return;
       }
     }
@@ -264,7 +298,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
       } else if (e.key === 'Escape') {
         e.preventDefault();
         handleClearLine();
-      } else if (/^[0-9xyab+\-=/()^²³⁴⁵]$/i.test(e.key)) {
+      } else if (/^[0-9xyzabc+\-=/()^²³⁴⁵]$/i.test(e.key)) {
         e.preventDefault();
         const sym = e.key === '-' ? '−' : e.key.toLowerCase();
         insertSymbol(sym);
@@ -702,7 +736,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
 
           {/* Fila 3: Variabili, Segni, Parentesi & Controlli */}
           <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            {['x', 'y', 'a', 'b'].map(v => (
+            {['x', 'y', 'z', 'a', 'b', 'c'].map(v => (
               <button
                 key={v}
                 type="button"

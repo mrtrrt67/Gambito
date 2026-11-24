@@ -711,6 +711,93 @@ function generateMcd5Terms(seed: number, diff: number): NotebookLevel {
   };
 }
 
+export function generateSquareTrinomial(seed: number, diff: number): NotebookLevel {
+  const variants = [
+    {
+      expr: 'x² + y² + 1 + 2xy + 2x + 2y',
+      res: '(x + y + 1)²',
+      hint: 'I tre quadrati sono x², y², 1. I tre doppi prodotti sono 2xy, 2x, 2y. Risultato: (x + y + 1)²',
+    },
+    {
+      expr: 'x² + y² + 4 + 2xy + 4x + 4y',
+      res: '(x + y + 2)²',
+      hint: 'I tre quadrati sono x², y², 4 = 2². I doppi prodotti sono 2xy, 4x, 4y. Risultato: (x + y + 2)²',
+    },
+    {
+      expr: 'x² + y² + 1 − 2xy + 2x − 2y',
+      res: '(x − y + 1)²',
+      hint: 'Nota i segni dei doppi prodotti: il segno meno su −2xy e −2y indica che la base di y è negativa (−y). Risultato: (x − y + 1)²',
+    },
+    {
+      expr: 'x² + 4y² + 9 + 4xy − 6x − 12y',
+      res: '(x + 2y − 3)²',
+      hint: 'I tre quadrati sono x², (2y)², 3². Dai segni di −6x e −12y deduci il segno di −3. Risultato: (x + 2y − 3)²',
+    },
+    {
+      expr: '4x² + y² + 1 − 4xy − 4x + 2y',
+      res: '(2x − y − 1)²',
+      hint: 'I tre quadrati sono (2x)², (−y)², (−1)². Risultato: (2x − y − 1)²',
+    },
+  ];
+
+  const item = variants[seed % variants.length]!;
+
+  return {
+    id: `gen-sqtrinom-${seed}`,
+    title: `Quadrato di Trinomio (Lv. ${diff}): ${item.expr}`,
+    expression: item.expr,
+    category: 'Scomposizione',
+    par: 2,
+    baseScore: 3200 + diff * 100,
+    hint: item.hint,
+    subType: 'square_trinomial',
+    metadata: {
+      finalResult: item.res,
+    },
+  };
+}
+
+export function generateCubeTrinomial(seed: number, diff: number): NotebookLevel {
+  const variants = [
+    {
+      expr: 'x³ + y³ + 1 + 3x²y + 3x² + 3xy² + 3y² + 3x + 3y + 6xy',
+      res: '(x + y + 1)³',
+      hint: 'I tre cubi sono x³, y³ e 1³ = 1. Riconosci la struttura del cubo di trinomio: la soluzione è (x + y + 1)³.',
+    },
+    {
+      expr: 'x³ + y³ − 1 + 3x²y − 3x² + 3xy² + 3y² + 3x − 3y − 6xy',
+      res: '(x + y − 1)³',
+      hint: 'I cubi sono x³, y³ e (−1)³ = −1. La soluzione notevole è (x + y − 1)³.',
+    },
+    {
+      expr: 'x³ − y³ + 1 − 3x²y + 3x² + 3xy² − 3y² + 3x − 3y − 6xy',
+      res: '(x − y + 1)³',
+      hint: 'I cubi sono x³, (−y)³ = −y³ e 1³ = 1. La soluzione notevole è (x − y + 1)³.',
+    },
+    {
+      expr: 'a³ + b³ + 8 + 3a²b + 6a² + 3ab² + 12b + 12a + 6b² + 12ab',
+      res: '(a + b + 2)³',
+      hint: 'I tre cubi sono a³, b³ e 2³ = 8. La soluzione notevole è (a + b + 2)³.',
+    },
+  ];
+
+  const item = variants[seed % variants.length]!;
+
+  return {
+    id: `gen-cubetrinom-${seed}`,
+    title: `Cubo di Trinomio (Lv. ${diff}): ${item.expr}`,
+    expression: item.expr,
+    category: 'Scomposizione',
+    par: 2,
+    baseScore: 3500 + diff * 120,
+    hint: item.hint,
+    subType: 'cube_trinomial',
+    metadata: {
+      finalResult: item.res,
+    },
+  };
+}
+
 /**
  * Genera un esercizio procedurale mirato su uno SPECIFICO argomento
  * a livello di difficoltà crescente.
@@ -818,6 +905,17 @@ export function generateTopicLevel(subType: SubType, difficultyLevel: number): N
     }
     case 'mcd_5terms': {
       const lvl = generateMcd5Terms(seed, difficultyLevel);
+      lvl.id = `topic-${subType}-${difficultyLevel}-${seed}`;
+      return lvl;
+    }
+    // QUADRATO E CUBO DI TRINOMIO
+    case 'square_trinomial': {
+      const lvl = generateSquareTrinomial(seed, difficultyLevel);
+      lvl.id = `topic-${subType}-${difficultyLevel}-${seed}`;
+      return lvl;
+    }
+    case 'cube_trinomial': {
+      const lvl = generateCubeTrinomial(seed, difficultyLevel);
       lvl.id = `topic-${subType}-${difficultyLevel}-${seed}`;
       return lvl;
     }

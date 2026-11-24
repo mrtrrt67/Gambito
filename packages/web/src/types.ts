@@ -104,7 +104,10 @@ export type SubType =
   // Scomposizioni: 5 Termini (Polinomi a 5 Termini)
   | 'grouping_3_2'
   | 'ruffini_degree4'
-  | 'mcd_5terms';
+  | 'mcd_5terms'
+  // Scomposizioni: Quadrato e Cubo di Trinomio
+  | 'square_trinomial'
+  | 'cube_trinomial';
 
 export interface NotebookLevel {
   id: string;

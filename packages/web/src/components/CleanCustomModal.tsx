@@ -203,6 +203,7 @@ export const CleanCustomModal: React.FC<CleanCustomModalProps> = ({
                   { sym: 'x³', label: 'x³', isExp: true },
                   { sym: 'x⁴', label: 'x⁴', isExp: true },
                   { sym: 'y²', label: 'y²', isExp: true },
+                  { sym: 'z', label: 'z' },
                   { sym: '+', label: '+' },
                   { sym: '−', label: '−' },
                   { sym: '=', label: '=' },
@@ -272,7 +273,14 @@ export const CleanCustomModal: React.FC<CleanCustomModalProps> = ({
                 </>
               ) : (
                 <>
-                  {['x² − 16', '25 − 4x²', 'x² + 5x + 6', 'x² − 7x + 12', '4x³ − 8x²'].map(p => (
+                  {[
+                    'x² − 16',
+                    'x² + 5x + 6',
+                    'x³ + 6x² + 12x + 8',
+                    'x² + y² + 4 + 2xy + 4x + 4y',
+                    'x³ + y³ + 1 + 3x²y + 3x² + 3xy² + 3y² + 3x + 3y + 6xy',
+                    '4x³ − 8x²',
+                  ].map(p => (
                     <button
                       key={p}
                       type="button"

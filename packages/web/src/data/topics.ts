@@ -11,6 +11,7 @@ export interface AlgebraTopic {
     | 'Scomposizioni: 3 Termini (Trinomi)'
     | 'Scomposizioni: 4 Termini (Quadrinomi)'
     | 'Scomposizioni: 5 Termini (Polinomi a 5 Termini)'
+    | 'Scomposizioni: Quadrato e Cubo di Trinomio'
     | 'Prossimi Argomenti';
   icon: string;
   formula: string;
@@ -483,6 +484,62 @@ export const ALGEBRA_TOPICS: AlgebraTopic[] = [
         mcd: '2',
         quot: 'x⁴-2x³+3x²-4x+5',
         finalResult: '2(x⁴-2x³+3x²-4x+5)',
+      },
+    },
+  },
+
+  // =========================================================================
+  // GRUPPO 6: SCOMPOSIZIONI - QUADRATO E CUBO DI TRINOMIO
+  // =========================================================================
+  {
+    id: 'topic-square-trinomial',
+    subType: 'square_trinomial',
+    name: 'Quadrato di Trinomio (6 Termini)',
+    category: 'Scomposizione',
+    group: 'Scomposizioni: Quadrato e Cubo di Trinomio',
+    icon: '📐',
+    formula: 'A² + B² + C² + 2AB + 2AC + 2BC = (A + B + C)²',
+    description: 'Riconosci i tre quadrati e i tre doppi prodotti con i rispettivi segni, componendo (A ± B ± C)².',
+    baseExample: {
+      id: 'lvl-topic-square-trinomial',
+      title: 'Quadrato di Trinomio: x² + y² + 4 + 2xy + 4x + 4y',
+      expression: 'x² + y² + 4 + 2xy + 4x + 4y',
+      category: 'Scomposizione',
+      par: 2,
+      baseScore: 3200,
+      hint: 'I tre quadrati sono x², y² e 4 = 2². I doppi prodotti sono 2xy, 4x, 4y (tutti positivi). La soluzione è (x + y + 2)²',
+      subType: 'square_trinomial',
+      metadata: {
+        sqA: 'x',
+        sqB: 'y',
+        sqC: '2',
+        chips: ['(x + y + 2)²', 'x', 'y', '2', '²'],
+      },
+    },
+  },
+  {
+    id: 'topic-cube-trinomial',
+    subType: 'cube_trinomial',
+    name: 'Cubo di Trinomio',
+    category: 'Scomposizione',
+    group: 'Scomposizioni: Quadrato e Cubo di Trinomio',
+    icon: '🧊',
+    formula: '(A + B + C)³',
+    description: 'Riconosci i tre cubi fondamentali A³, B³, C³ e i prodotti misti, scrivendo direttamente (A ± B ± C)³.',
+    baseExample: {
+      id: 'lvl-topic-cube-trinomial',
+      title: 'Cubo di Trinomio: x³ + y³ + 1 + 3x²y + 3x² + 3xy² + 3y² + 3x + 3y + 6xy',
+      expression: 'x³ + y³ + 1 + 3x²y + 3x² + 3xy² + 3y² + 3x + 3y + 6xy',
+      category: 'Scomposizione',
+      par: 2,
+      baseScore: 3500,
+      hint: 'I tre cubi sono x³, y³ e 1³ = 1. Riconosci la struttura notevole del cubo di trinomio: la soluzione è (x + y + 1)³.',
+      subType: 'cube_trinomial',
+      metadata: {
+        cA: 'x',
+        cB: 'y',
+        cC: '1',
+        chips: ['(x + y + 1)³', 'x', 'y', '1', '³'],
       },
     },
   },

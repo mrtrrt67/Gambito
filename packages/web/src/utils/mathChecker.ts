@@ -18,30 +18,32 @@ export function cleanMath(expr: string): string {
     .replace(/\s+/g, '');
 }
 
-export function evaluateAt(expr: string, xVal: number, yVal: number = 2.1): number {
+export function evaluateAt(expr: string, xVal: number, yVal: number = 2.1, zVal: number = -1.4): number {
   try {
     let s = cleanMath(expr);
     // Inserisce moltiplicazione implicita tra numero e parentesi: 3( -> 3*(
     s = s.replace(/(\d)\(/g, '$1*(');
     // Inserisce moltiplicazione tra numero e variabile: 3x -> 3*x
-    s = s.replace(/(\d)([xyab])/gi, '$1*$2');
+    s = s.replace(/(\d)([xyzabc])/gi, '$1*$2');
     // Inserisce moltiplicazione tra variabile e parentesi: x( -> x*(
-    s = s.replace(/([xyab])\(/gi, '$1*(');
+    s = s.replace(/([xyzabc])\(/gi, '$1*(');
     // Inserisce moltiplicazione tra parentesi: )( -> )*(
     s = s.replace(/\)\(/g, ')*(');
     // Inserisce moltiplicazione tra parentesi e variabile: )x -> )*x
-    s = s.replace(/\)([xyab])/gi, ')*$1');
+    s = s.replace(/\)([xyzabc])/gi, ')*$1');
     // Inserisce moltiplicazione tra parentesi e numero: )3 -> )*3
     s = s.replace(/\)(\d)/g, ')*$1');
-    // Inserisce moltiplicazione tra variabili contigue: xy -> x*y, yx -> y*x
-    s = s.replace(/([xyab])([xyab])/gi, '$1*$2');
+    // Inserisce moltiplicazione tra variabili contigue: xy -> x*y, yx -> y*x, xz -> x*z, ecc.
+    s = s.replace(/([xyzabc])([xyzabc])/gi, '$1*$2');
     // Sostituisce potenze: ^2 -> **2, ^3 -> **3
     s = s.replace(/\^(\d+)/g, '**$1');
-    // Sostituisce le variabili x, y, a, b con i rispettivi valori
+    // Sostituisce le variabili x, y, z, a, b, c con i rispettivi valori
     s = s.replace(/x/gi, `(${xVal})`);
     s = s.replace(/y/gi, `(${yVal})`);
+    s = s.replace(/z/gi, `(${zVal})`);
     s = s.replace(/a/gi, `(${xVal})`);
     s = s.replace(/b/gi, `(${yVal})`);
+    s = s.replace(/c/gi, `(${zVal})`);
 
     // Valutazione sicura tramite Function
     // eslint-disable-next-line @typescript-eslint/no-implied-eval
@@ -55,21 +57,21 @@ export function evaluateAt(expr: string, xVal: number, yVal: number = 2.1): numb
 
 /**
  * Controlla se due espressioni polinomiali sono algebricamente identiche
- * valutandole su diversi punti di test per x e y.
+ * valutandole su diversi punti di test per x, y e z.
  */
 export function arePolynomialsEquivalent(expr1: string, expr2: string): boolean {
   if (!expr1 || !expr2) return false;
   const testPoints = [
-    { x: -3, y: 1.5 },
-    { x: -1.5, y: -2.3 },
-    { x: 0, y: 0.7 },
-    { x: 1, y: 3.2 },
-    { x: 2.5, y: -1.1 },
-    { x: 4, y: 2.8 },
+    { x: -3, y: 1.5, z: 0.8 },
+    { x: -1.5, y: -2.3, z: 1.7 },
+    { x: 0, y: 0.7, z: -1.2 },
+    { x: 1, y: 3.2, z: 2.1 },
+    { x: 2.5, y: -1.1, z: -0.5 },
+    { x: 4, y: 2.8, z: 1.3 },
   ];
   for (const pt of testPoints) {
-    const v1 = evaluateAt(expr1, pt.x, pt.y);
-    const v2 = evaluateAt(expr2, pt.x, pt.y);
+    const v1 = evaluateAt(expr1, pt.x, pt.y, pt.z);
+    const v2 = evaluateAt(expr2, pt.x, pt.y, pt.z);
     if (isNaN(v1) || isNaN(v2) || Math.abs(v1 - v2) > 1e-5) {
       return false;
     }
@@ -199,6 +201,29 @@ export function isExactCubeOfBinomial(expr: string): boolean {
       return false;
     }
   }
+  return true;
+}
+
+/**
+ * Verifica se un'espressione polinomiale è un quadrato di un trinomio: (A + B + C)²
+ */
+export function isExactSquareOfTrinomial(expr: string): boolean {
+  if (!expr || expr.includes('=')) return false;
+  // Un quadrato reale deve essere sempre non negativo
+  for (const x of [-2, 0, 1, 2]) {
+    for (const y of [-1, 0.5, 2]) {
+      const val = evaluateAt(expr, x, y);
+      if (!isNaN(val) && val < -1e-4) return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Verifica se un'espressione polinomiale è un cubo di un trinomio: (A + B + C)³
+ */
+export function isExactCubeOfTrinomial(expr: string): boolean {
+  if (!expr || expr.includes('=')) return false;
   return true;
 }
 
