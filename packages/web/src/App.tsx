@@ -342,6 +342,7 @@ export const App: React.FC = () => {
           onWin={handleWin}
           onMistake={handleMistake}
           onMoveAction={handleMoveAction}
+          onOpenHint={() => setIsHintOpen(true)}
         />
 
         {/* Pulsanti Azione quando il Risultato Finale è Raggiunto */}
