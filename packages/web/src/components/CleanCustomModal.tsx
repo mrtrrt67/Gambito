@@ -162,7 +162,14 @@ export const CleanCustomModal: React.FC<CleanCustomModalProps> = ({
               type="text"
               value={expression}
               onChange={e => {
-                setExpression(e.target.value);
+                const val = e.target.value
+                  .replace(/\^0/g, '⁰')
+                  .replace(/\^1/g, '¹')
+                  .replace(/\^2/g, '²')
+                  .replace(/\^3/g, '³')
+                  .replace(/\^4/g, '⁴')
+                  .replace(/\^5/g, '⁵');
+                setExpression(val);
                 setError(null);
               }}
               placeholder={category === 'Equazione' ? 'es. 4x - 6 = 10' : 'es. x² - 25 o x² + 5x + 6'}
@@ -180,6 +187,53 @@ export const CleanCustomModal: React.FC<CleanCustomModalProps> = ({
                 outline: 'none',
               }}
             />
+
+            {/* Tasti Rapidi Esponenti e Simboli per Input */}
+            <div style={{ marginTop: '0.6rem', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700 }}>
+                ⚡ Inserisci esponenti e simboli:
+              </span>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {[
+                  { sym: '²', label: '²', isExp: true },
+                  { sym: '³', label: '³', isExp: true },
+                  { sym: '⁴', label: '⁴', isExp: true },
+                  { sym: '⁵', label: '⁵', isExp: true },
+                  { sym: 'x²', label: 'x²', isExp: true },
+                  { sym: 'x³', label: 'x³', isExp: true },
+                  { sym: 'x⁴', label: 'x⁴', isExp: true },
+                  { sym: 'y²', label: 'y²', isExp: true },
+                  { sym: '+', label: '+' },
+                  { sym: '−', label: '−' },
+                  { sym: '=', label: '=' },
+                  { sym: '(', label: '(' },
+                  { sym: ')', label: ')' },
+                  { sym: '/', label: '/' },
+                ].map(item => (
+                  <button
+                    key={item.sym}
+                    type="button"
+                    onClick={() => {
+                      setExpression(prev => prev + item.sym);
+                      setError(null);
+                    }}
+                    style={{
+                      padding: '0.35rem 0.65rem',
+                      borderRadius: '8px',
+                      background: item.isExp ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                      border: item.isExp ? '1px solid #c084fc' : '1px solid rgba(255, 255, 255, 0.15)',
+                      color: item.isExp ? '#e9d5ff' : '#fff',
+                      fontFamily: 'var(--font-math)',
+                      fontSize: item.sym === '²' || item.sym === '³' || item.sym === '⁴' || item.sym === '⁵' ? '1.25rem' : '1rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {error && (

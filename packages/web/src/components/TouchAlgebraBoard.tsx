@@ -64,7 +64,19 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
   // Inserimento simbolo o pezzetto matematico
   const insertSymbol = useCallback((sym: string) => {
     onMoveAction();
-    setCurrentWriting(prev => prev + sym);
+    setCurrentWriting(prev => {
+      // Se l'utente digita un numero subito dopo '^', trasformiamo in esponente
+      if (prev.endsWith('^')) {
+        const expMap: Record<string, string> = {
+          '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+          '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
+        };
+        if (expMap[sym]) {
+          return prev.slice(0, -1) + expMap[sym];
+        }
+      }
+      return prev + sym;
+    });
     setFeedback(null);
     setIsError(false);
   }, [onMoveAction]);
@@ -73,8 +85,8 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
   const handleBackspace = useCallback(() => {
     setCurrentWriting(prev => {
       if (!prev) return '';
-      // Gestione cancellazione esponenti e simboli composti
-      if (prev.endsWith('x²') || prev.endsWith('x³') || prev.endsWith('x⁴')) {
+      // Gestione cancellazione token di 2 caratteri come x², x³, x⁴, y²
+      if (prev.endsWith('x²') || prev.endsWith('x³') || prev.endsWith('x⁴') || prev.endsWith('y²')) {
         return prev.slice(0, -2);
       }
       return prev.slice(0, -1);
@@ -215,7 +227,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
       } else if (e.key === 'Escape') {
         e.preventDefault();
         handleClearLine();
-      } else if (/^[0-9xy+\-=/()]$/i.test(e.key)) {
+      } else if (/^[0-9xyab+\-=/()^²³⁴⁵]$/i.test(e.key)) {
         e.preventDefault();
         const sym = e.key === '-' ? '−' : e.key.toLowerCase();
         insertSymbol(sym);
@@ -556,9 +568,104 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
             ))}
           </div>
 
-          {/* Fila 2: Lettere, Potenze, Segni, Parentesi, Uguale */}
+          {/* Fila 2: Esponenti & Potenze (In Evidenza) */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            flexWrap: 'wrap',
+            background: 'rgba(168, 85, 247, 0.08)',
+            border: '1px solid rgba(168, 85, 247, 0.25)',
+            borderRadius: '14px',
+            padding: '0.45rem 0.75rem',
+          }}>
+            <span style={{
+              fontSize: '0.8rem',
+              color: '#c084fc',
+              fontWeight: 900,
+              letterSpacing: '0.5px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              marginRight: '2px',
+            }}>
+              <span>⚡</span> ESPONENTI:
+            </span>
+
+            {/* Esponenti Puri (da applicare a parentesi, lettere o numeri) */}
+            {[
+              { sym: '²', label: '²', title: 'Esponente 2 (Quadrato)' },
+              { sym: '³', label: '³', title: 'Esponente 3 (Cubo)' },
+              { sym: '⁴', label: '⁴', title: 'Esponente 4' },
+              { sym: '⁵', label: '⁵', title: 'Esponente 5' },
+              { sym: '^', label: 'xⁿ', title: 'Esponente (^)' },
+            ].map(item => (
+              <button
+                key={item.sym}
+                type="button"
+                draggable
+                onDragStart={e => handleDragStart(e, item.sym)}
+                onClick={() => insertSymbol(item.sym)}
+                title={item.title}
+                style={{
+                  minWidth: '44px',
+                  height: '42px',
+                  padding: '0 0.55rem',
+                  borderRadius: '10px',
+                  background: 'rgba(168, 85, 247, 0.18)',
+                  border: '1.5px solid #c084fc',
+                  color: '#e9d5ff',
+                  fontFamily: 'var(--font-math)',
+                  fontSize: item.sym === '^' ? '1.1rem' : '1.5rem',
+                  fontWeight: 900,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(168, 85, 247, 0.2)',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {item.label}
+              </button>
+            ))}
+
+            {/* Divisore sottile */}
+            <div style={{ width: '1px', height: '28px', background: 'rgba(168, 85, 247, 0.3)', margin: '0 4px' }} />
+
+            {/* Scorciatoie potenze con variabile */}
+            {[
+              { sym: 'x²', label: 'x²' },
+              { sym: 'x³', label: 'x³' },
+              { sym: 'x⁴', label: 'x⁴' },
+              { sym: 'y²', label: 'y²' },
+            ].map(p => (
+              <button
+                key={p.sym}
+                type="button"
+                draggable
+                onDragStart={e => handleDragStart(e, p.sym)}
+                onClick={() => insertSymbol(p.sym)}
+                style={{
+                  minWidth: '44px',
+                  height: '42px',
+                  padding: '0 0.55rem',
+                  borderRadius: '10px',
+                  background: 'rgba(0, 240, 255, 0.1)',
+                  border: '1.5px solid rgba(0, 240, 255, 0.45)',
+                  color: '#00f0ff',
+                  fontFamily: 'var(--font-math)',
+                  fontSize: '1.3rem',
+                  fontWeight: 900,
+                  cursor: 'pointer',
+                }}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Fila 3: Variabili, Segni, Parentesi & Controlli */}
           <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            {['x', 'x²', 'x³', 'x⁴', 'y'].map(v => (
+            {['x', 'y', 'a', 'b'].map(v => (
               <button
                 key={v}
                 type="button"
@@ -566,7 +673,7 @@ export const TouchAlgebraBoard: React.FC<TouchAlgebraBoardProps> = ({
                 onDragStart={e => handleDragStart(e, v)}
                 onClick={() => insertSymbol(v)}
                 style={{
-                  minWidth: '42px',
+                  minWidth: '40px',
                   height: '42px',
                   padding: '0 0.5rem',
                   borderRadius: '10px',

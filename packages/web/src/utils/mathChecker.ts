@@ -5,31 +5,43 @@
 export function cleanMath(expr: string): string {
   return expr
     .replace(/−/g, '-')
+    .replace(/⁰/g, '^0')
+    .replace(/¹/g, '^1')
     .replace(/²/g, '^2')
     .replace(/³/g, '^3')
     .replace(/⁴/g, '^4')
+    .replace(/⁵/g, '^5')
+    .replace(/⁶/g, '^6')
+    .replace(/⁷/g, '^7')
+    .replace(/⁸/g, '^8')
+    .replace(/⁹/g, '^9')
     .replace(/\s+/g, '');
 }
 
-export function evaluateAt(expr: string, xVal: number): number {
+export function evaluateAt(expr: string, xVal: number, yVal: number = 2.1): number {
   try {
     let s = cleanMath(expr);
     // Inserisce moltiplicazione implicita tra numero e parentesi: 3( -> 3*(
     s = s.replace(/(\d)\(/g, '$1*(');
     // Inserisce moltiplicazione tra numero e variabile: 3x -> 3*x
-    s = s.replace(/(\d)x/gi, '$1*x');
+    s = s.replace(/(\d)([xyab])/gi, '$1*$2');
     // Inserisce moltiplicazione tra variabile e parentesi: x( -> x*(
-    s = s.replace(/x\(/gi, 'x*(');
+    s = s.replace(/([xyab])\(/gi, '$1*(');
     // Inserisce moltiplicazione tra parentesi: )( -> )*(
     s = s.replace(/\)\(/g, ')*(');
     // Inserisce moltiplicazione tra parentesi e variabile: )x -> )*x
-    s = s.replace(/\)x/gi, ')*x');
+    s = s.replace(/\)([xyab])/gi, ')*$1');
     // Inserisce moltiplicazione tra parentesi e numero: )3 -> )*3
     s = s.replace(/\)(\d)/g, ')*$1');
-    // Sostituisce potenze: ^2 -> **2
+    // Inserisce moltiplicazione tra variabili contigue: xy -> x*y, yx -> y*x
+    s = s.replace(/([xyab])([xyab])/gi, '$1*$2');
+    // Sostituisce potenze: ^2 -> **2, ^3 -> **3
     s = s.replace(/\^(\d+)/g, '**$1');
-    // Sostituisce la x con il valore numerico racchiuso tra parentesi
+    // Sostituisce le variabili x, y, a, b con i rispettivi valori
     s = s.replace(/x/gi, `(${xVal})`);
+    s = s.replace(/y/gi, `(${yVal})`);
+    s = s.replace(/a/gi, `(${xVal})`);
+    s = s.replace(/b/gi, `(${yVal})`);
 
     // Valutazione sicura tramite Function
     // eslint-disable-next-line @typescript-eslint/no-implied-eval
@@ -43,14 +55,21 @@ export function evaluateAt(expr: string, xVal: number): number {
 
 /**
  * Controlla se due espressioni polinomiali sono algebricamente identiche
- * valutandole su diversi punti di test.
+ * valutandole su diversi punti di test per x e y.
  */
 export function arePolynomialsEquivalent(expr1: string, expr2: string): boolean {
   if (!expr1 || !expr2) return false;
-  const testPoints = [-3, -1.5, 0, 1, 2.5, 4];
-  for (const x of testPoints) {
-    const v1 = evaluateAt(expr1, x);
-    const v2 = evaluateAt(expr2, x);
+  const testPoints = [
+    { x: -3, y: 1.5 },
+    { x: -1.5, y: -2.3 },
+    { x: 0, y: 0.7 },
+    { x: 1, y: 3.2 },
+    { x: 2.5, y: -1.1 },
+    { x: 4, y: 2.8 },
+  ];
+  for (const pt of testPoints) {
+    const v1 = evaluateAt(expr1, pt.x, pt.y);
+    const v2 = evaluateAt(expr2, pt.x, pt.y);
     if (isNaN(v1) || isNaN(v2) || Math.abs(v1 - v2) > 1e-5) {
       return false;
     }
