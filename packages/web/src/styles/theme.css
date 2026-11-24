@@ -1,0 +1,104 @@
+:root {
+  --bg-dark: #0a0e1a;
+  --bg-paper: #101626;
+  --paper-line: rgba(56, 189, 248, 0.07);
+  --border-paper: #1e293b;
+  
+  --token-num: #fbbf24;
+  --token-var: #00f0ff;
+  --token-plus: #34d399;
+  --token-minus: #f87171;
+  --token-equal: #c084fc;
+  
+  --font-math: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: 'Cinzel', serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: #f8fafc;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+  font-family: inherit;
+}
+
+/* Griglia quaderno a quadretti */
+.notebook-grid {
+  background-color: var(--bg-paper);
+  background-image: 
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+
+/* Animazioni */
+@keyframes shake-math {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+@keyframes pop-entry {
+  0% { transform: scale(0.9) translateY(10px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes glow-success {
+  0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(52, 211, 153, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+.animate-shake {
+  animation: shake-math 0.4s ease-in-out;
+}
+
+.animate-pop {
+  animation: pop-entry 0.25s ease-out;
+}
+
+.glow-win {
+  animation: glow-success 1.5s infinite;
+}
+
+/* Tessere Interattive Notebook */
+.notebook-token {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0.6rem 0.9rem;
+  border-radius: 12px;
+  background: #0c1222;
+  border: 1.5px solid #243556;
+  font-family: var(--font-math);
+  font-size: 1.65rem;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  cursor: grab;
+  position: relative;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.notebook-token:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+}
